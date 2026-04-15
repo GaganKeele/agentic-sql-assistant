@@ -1,21 +1,15 @@
 from fastapi import FastAPI
 from contextlib import asynccontextmanager
 from pydantic import BaseModel
+from graph.main_graph import main_graph
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # STARTUP — this runs before the app accepts requests
-    print("Starting up...")
-    print("App ready")
+    print("✅ LangGraph loaded")
     yield
-    # SHUTDOWN — this runs when app stops
     print("Shutting down...")
 
-app = FastAPI(
-    title="Agentic SQL Assistant",
-    description="Natural language to SQL using LangGraph + ReAct",
-    lifespan=lifespan
-)
+app = FastAPI(title="Agentic SQL Assistant", lifespan=lifespan)
 
 class ChatRequest(BaseModel):
     session_id: str
@@ -27,8 +21,22 @@ async def health():
 
 @app.post("/chat")
 async def chat(request: ChatRequest):
-    # Placeholder — we'll wire LangGraph here on Day 2
+    initial_state = {
+        "question": request.question,
+        "session_id": request.session_id,
+        "conversation_history": [],
+        "language": None,
+        "rephrased_question": None,
+        "decomposed_questions": None,
+        "question_types": None,
+        "final_answer": None,
+    }
+
+    result = await main_graph.ainvoke(initial_state)
+
     return {
         "session_id": request.session_id,
-        "answer": f"Echo: {request.question}"
+        "answer": result["final_answer"],
+        "language_detected": result["language"],
+        "rephrased_as": result["rephrased_question"]
     }

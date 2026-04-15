@@ -12,7 +12,8 @@ jobs:
   test:
     name: Run Tests
     runs-on: ubuntu-latest    # GitHub gives you a free Linux machine
-
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true 
     steps:
       # Step 1: Download your code onto GitHub's machine
       - name: Checkout code
