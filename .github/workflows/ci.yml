@@ -17,7 +17,8 @@ jobs:
       # Step 1: Download your code onto GitHub's machine
       - name: Checkout code
         uses: actions/checkout@v4
-
+        with:
+          node-version: '24'
       # Step 2: Install Python
       - name: Set up Python 3.11
         uses: actions/setup-python@v5
