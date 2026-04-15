@@ -1,0 +1,42 @@
+name: CI Pipeline
+
+# WHEN does this run?
+on:
+  push:
+    branches: [ main, dev ]   # Every push to main or dev
+  pull_request:
+    branches: [ main ]        # Every PR targeting main
+
+# WHAT does it do?
+jobs:
+  test:
+    name: Run Tests
+    runs-on: ubuntu-latest    # GitHub gives you a free Linux machine
+
+    steps:
+      # Step 1: Download your code onto GitHub's machine
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Step 2: Install Python
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      # Step 3: Cache dependencies (makes pipeline faster)
+      - name: Cache pip packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
+
+      # Step 4: Install your project dependencies
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      # Step 5: Run your tests
+      - name: Run tests
+        run: pytest tests/ -v
+        env:
+          GROQ_API_KEY: "test_key"   # Fake key for tests
